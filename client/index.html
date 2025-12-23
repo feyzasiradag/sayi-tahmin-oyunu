@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <title>Sayı Tahmin Oyunu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="background-anim"></div>
+
+<header>
+  <h1>🔮 Sayı Tahmin Oyunu</h1>
+  <p>Kurallar: <span class="badge red">Yok: -1</span> <span class="badge yellow">Yanlış Yer: +1</span> <span class="badge green">Doğru Yer: +2</span></p>
+</header>
+
+<main class="grid">
+  <section class="card glass">
+    <div class="card-header">
+        <h2>🚀 Oyuna Katıl</h2>
+    </div>
+    <div class="card-body">
+        <input id="name" type="text" placeholder="Kullanıcı Adı" value="Oyuncu1" autocomplete="off">
+        
+        <div style="margin-bottom: 5px;">
+            <label style="font-size: 0.9rem; font-weight:bold; color:#475569;">Zorluk Seviyesi:</label>
+            <select id="digitCount" style="width:100%; padding:8px; border-radius:8px; border:2px solid #e2e8f0; background:#fff;">
+                <option value="3">3 Haneli (Kolay)</option>
+                <option value="4" selected>4 Haneli (Normal)</option>
+                <option value="5">5 Haneli (Zor)</option>
+                <option value="6">6 Haneli (Uzman)</option>
+                <option value="7">7 Haneli (İmkansız)</option>
+            </select>
+        </div>
+
+        <div class="btn-group">
+            <button id="joinBtn" class="btn btn-primary">Bağlan</button>
+            <button id="startBtn" class="btn btn-secondary">Turu Başlat</button>
+        </div>
+    </div>
+  </section>
+
+  <section class="card glass">
+    <div class="card-header">
+        <h2>🔢 Tahmin Yap</h2>
+    </div>
+    <div class="card-body">
+        <div id="turn-status" style="font-weight:bold; text-align:center; padding: 5px; border-radius: 6px; background: rgba(255,255,255,0.5);">
+            Önce oyuna katılın...
+        </div>
+
+        <input id="guess" type="number" placeholder="Sayı bekleniyor..." autocomplete="off" disabled>
+        <button id="guessBtn" class="btn btn-action btn-disabled" disabled>Tahmini Gönder</button>
+    </div>
+  </section>
+
+  <section class="card wide glass">
+    <div class="card-header">
+        <h2>📜 Oyun Akışı</h2>
+    </div>
+    <div id="log"></div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

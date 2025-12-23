@@ -1,0 +1,5 @@
+cd server
+python server.py
+
+cd client
+python -m http.server
