@@ -37,12 +37,10 @@ class GameRoom:
             del self.players[player_name]
         
         if player_name in self.player_order:
-            # Eğer ayrılan kişinin sırasıysa veya ondan önceyse indexi düzeltmeliyiz
+            # Eğer ayrılan kişinin sırasıysa veya ondan önceyse indexi düzelt
             idx = self.player_order.index(player_name)
             self.player_order.remove(player_name)
             
-            # Eğer ayrılan kişi sıradaki kişiyse, sıra otomatik sonrakine geçer (index değişmez)
-            # Ama index listenin dışına taştıysa başa sarar
             if self.turn_index >= len(self.player_order):
                 self.turn_index = 0
 
@@ -80,7 +78,6 @@ class GameRoom:
                 total -= 1
         return breakdown, total
 
-# TÜM ODALARI TUTAN SÖZLÜK
 ROOMS = {}
 
 async def broadcast_room(room, msg):
@@ -89,7 +86,7 @@ async def broadcast_room(room, msg):
         try:
             await p.ws.send(data)
         except:
-            pass # Ölü soketleri remove_player halledecek
+            pass 
 
 async def handler(ws):
     player = None
@@ -102,7 +99,7 @@ async def handler(ws):
 
             if action == "join":
                 name = msg.get("name")
-                room_id = msg.get("room_id", "genel") # Oda adı gelmezse "genel" olsun
+                room_id = msg.get("room_id", "genel")
 
                 # Odayı bul veya oluştur
                 if room_id not in ROOMS:
@@ -116,7 +113,7 @@ async def handler(ws):
                 player = Player(name, ws)
                 current_room.players[name] = player
 
-                # Bağlantı başarılı mesajı
+                # Bağlantı başarılı 
                 await ws.send(json.dumps({
                     "action": "joined",
                     "players": list(current_room.players.keys()),
@@ -124,7 +121,7 @@ async def handler(ws):
                     "room_id": room_id
                 }, ensure_ascii=False))
                 
-                # Odaya duyur
+                # Odaya mesaj
                 await broadcast_room(current_room, {
                      "action": "update_users",
                      "players": list(current_room.players.keys())
@@ -173,31 +170,28 @@ async def handler(ws):
                     response["action"] = "round_won"
                     response["winner"] = player.name
                     response["secret"] = current_room.secret
+                    response["winner_points"] = player.total
                 
                 await broadcast_room(current_room, response)
 
     except websockets.ConnectionClosed:
         pass
     finally:
-        # KOPMA İŞLEMLERİ (Server'ı kapatıp açmaya gerek kalmaz)
         if current_room and player:
             print(f"{player.name} odadan düştü.")
             current_room.remove_player(player.name)
             
-            # Kalanlara haber ver
             await broadcast_room(current_room, {
                 "action": "update_users",
                 "players": list(current_room.players.keys())
             })
             
-            # Eğer oyun aktifse ve oyuncu gittiği için sıra karıştıysa güncelle
             if current_room.active:
                 await broadcast_room(current_room, {
-                    "action": "turn_update", # Sadece sırayı güncellemek için özel mesaj
+                    "action": "turn_update",
                     "next_turn": current_room.get_current_player_name()
                 })
 
-            # Oda boşaldıysa RAM'den sil
             if not current_room.players:
                 print(f"Oda {current_room.room_id} silindi.")
                 del ROOMS[current_room.room_id]

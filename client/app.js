@@ -1,6 +1,6 @@
 let ws = null;
 let myName = ""; 
-let currentLevel = 4; // Seçilen seviyeyi hafızada tutacağız
+let currentLevel = 4; 
 const el = (id) => document.getElementById(id);
 
 // LOG SİSTEMİ
@@ -48,15 +48,15 @@ function updateTurnUI(nextPlayerName) {
     }
 }
 
-// ODAYA GİRİŞ (Mantık burada değişti)
+// ODAYA GİRİŞ 
 el("joinBtn").onclick = () => {
   const inputName = el("name").value;
   
-  // 1. ZORLUK SEVİYESİNİ AL
+  // ZORLUK SEVİYESİNİ AL
   const level = el("digitCount").value;
-  currentLevel = level; // Hafızaya at, başlatırken lazım olacak
+  currentLevel = level; 
 
-  // 2. ODA İSMİNİ OTOMATİK OLUŞTUR (Örn: "Level_4_Room")
+  // ODA İSMİNİ OLUŞTUR
   const autoRoomName = `Seviye_${level}`; 
 
   if (!inputName) {
@@ -65,10 +65,9 @@ el("joinBtn").onclick = () => {
   }
   if (ws && ws.readyState === WebSocket.OPEN) return;
 
-  ws = new WebSocket("ws://localhost:8765");
+  ws = new WebSocket("ws://192.168.63.228:8765");
 
   ws.onopen = () => {
-    // Otomatik oluşturulan oda ismini gönderiyoruz
     ws.send(JSON.stringify({ 
         action: "join", 
         name: inputName,
@@ -82,11 +81,9 @@ el("joinBtn").onclick = () => {
     if (msg.action === "joined") {
       myName = msg.my_name;
       el("name").value = myName;
-      // Kullanıcıya dostça bir mesaj ver
       log(`✅ ${msg.room_id} Odasına Hoşgeldin! (${currentLevel} Haneli Oyun)`, "joined");
       log("👥 Odadakiler: " + msg.players.join(", "), "normal");
       
-      // Zorluk seçimini kilitleyebiliriz kafa karışmasın diye
       el("digitCount").disabled = true; 
     }
 
@@ -106,6 +103,15 @@ el("joinBtn").onclick = () => {
     }
 
     if (msg.action === "guess_result") {
+      console.log(
+          `[TAHMİN] Oyuncu: ${msg.player}`,
+          `Tahmin: ${msg.guess}`,
+          `Breakdown:`, msg.breakdown,
+          `Puan: ${msg.points}`,
+          `Toplam: ${msg.total}`,
+          `Sonraki Sıra: ${msg.next_turn}`
+        );
+
       const visual = msg.breakdown.map(v => 
           v === 2 ? "🟩" : (v === 1 ? "🟨" : "⬛")
       ).join("");
@@ -114,9 +120,16 @@ el("joinBtn").onclick = () => {
       log(`${msg.player} [${msg.guess}] ${visual} (${textBreakdown}) | Puan: ${msg.total}`, msg.points > 0 ? "success" : "error");
       updateTurnUI(msg.next_turn);
     }
+     
+
+
 
     if (msg.action === "round_won") {
-      log(`🏆 KAZANAN: ${msg.winner} | Gizli Sayı: ${msg.secret}`, "info");
+      log(
+        `🏆 KAZANAN: ${msg.winner} | Puan: ${msg.winner_points} | Gizli Sayı: ${msg.secret}`,
+        "info"
+      );
+
       el("turn-status").textContent = "🏁 Oyun Bitti";
       el("turn-status").style.background = "#fff";
       el("turn-status").style.color = "#333";
@@ -124,12 +137,13 @@ el("joinBtn").onclick = () => {
       el("guessBtn").disabled = true;
     }
 
+
     if (msg.action === "error") log("❌ " + msg.message, "error");
   };
   
   ws.onclose = () => {
       log("🔴 Sunucudan koptunuz.", "error");
-      el("digitCount").disabled = false; // Kopunca seçimi tekrar aç
+      el("digitCount").disabled = false; 
   };
 };
 
@@ -139,7 +153,7 @@ el("startBtn").onclick = () => {
       log("⚠️ Önce bir odaya girmelisiniz!", "error");
       return;
   }
-  // Giriş yaparken seçtiğimiz seviyeyi (currentLevel) kullanıyoruz
+
   ws.send(JSON.stringify({ 
       action: "start_round", 
       length: currentLevel 
