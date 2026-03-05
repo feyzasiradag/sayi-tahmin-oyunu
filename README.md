@@ -1,6 +1,8 @@
 # Sayı Tahmin Oyunu (Multiplayer)
 
 ![Oyun Ekranı](oyun.png)
+
+
 Python (WebSockets) ve Vanilla JavaScript ile geliştirilmiş, sıra tabanlı ve gerçek zamanlı bir çok oyunculu sayı tahmin oyunudur.
 
 ## Özellikler
